@@ -4,7 +4,7 @@ from PIL import Image
 import json
 import numpy as np
 import torch
-class Connect4Dataset(Dataset):
+class TicTacToeDataset(Dataset):
     def __init__(self, labels_path="data/labels.json", images_dir="data/images", transform=None):
         """
         Custom Dataset for Tic Tac Toe images and labels.
@@ -38,7 +38,7 @@ class Connect4Dataset(Dataset):
         # Get image name and load image
         image_name = self.image_names[idx]
         image_path = self.images_dir / image_name
-        image = Image.open(image_path).convert('RGB')
+        image = Image.open(image_path).convert('L')
         
         # Get label grid (3x3)
         grid = np.array(self.labels_data[image_name]["grid"], dtype=np.int64)
@@ -46,9 +46,9 @@ class Connect4Dataset(Dataset):
         # Apply transforms
         if self.transform:
             image = self.transform(image)
-        
         # Convert grid to tensor
         label = torch.from_numpy(grid)  # Shape: (3, 3)
+        
         
         return image, label
 

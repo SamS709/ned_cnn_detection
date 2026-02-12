@@ -8,7 +8,7 @@ import numpy as np
 
 import matplotlib.pyplot as plt
 from model import Model
-from data_loader import Connect4Dataset
+from data_loader import TicTacToeDataset
 from transformer import transform_train
 
 
@@ -56,13 +56,14 @@ def train_with_scheduler(model, optimizer, loss_fn, metric, train_loader,
 
 
 if __name__ == "__main__":
-    device = "cuda" if torch.cuda.is_available() else "cpu"
+    # device = "cuda" if torch.cuda.is_available() else "cpu"
+    device = "cpu"
     print(f"Using device: {device}")
     
     # Create dataset
-    dataset = Connect4Dataset(
-        labels_path="data/labels.json",
-        images_dir="data/images",
+    dataset = TicTacToeDataset(
+        labels_path="tictactoe/data/labels.json",
+        images_dir="tictactoe/data/images",
         transform=transform_train
     )
     
@@ -76,16 +77,16 @@ if __name__ == "__main__":
 
     
     # Create DataLoaders
-    train_loader = DataLoader(train_set, batch_size=8, shuffle=True, num_workers=2)
-    val_loader = DataLoader(val_set, batch_size=8, shuffle=False, num_workers=2)
+    train_loader = DataLoader(train_set, batch_size=32, shuffle=True, num_workers=2)
+    val_loader = DataLoader(val_set, batch_size=32, shuffle=False, num_workers=2)
     
     # Initialize model
     model = Model().to(device)
     
     # Training parameters
-    model_dir = "models"
-    plot_dir = "plots"
-    n_epochs = 50
+    model_dir = "tictactoe/models"
+    plot_dir = "tictactoe/plots"
+    n_epochs = 5
     optimizer = torch.optim.Adam(params=model.parameters(), lr=0.001)
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode="max", patience=5, factor=0.1)
     accuracy = torchmetrics.Accuracy(task="multiclass", num_classes=3).to(device)
@@ -101,7 +102,7 @@ if __name__ == "__main__":
     plt.plot(history["train_metrics"])
     plt.plot(history["valid_metrics"])
     
-    plt.savefig(os.path.join(plot_dir, "training_plot2.png"))
-    torch.save(model, os.path.join(model_dir,"model2.pt"))
+    plt.savefig(os.path.join(plot_dir, "training_plot.png"))
+    torch.save(model, os.path.join(model_dir,"model.pt"))
     
 

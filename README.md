@@ -1,6 +1,6 @@
-# Connect 4 Detection
+# Ned CNN Detection
 
-This project implements computer vision detection for Connect 4 game boards using deep learning. It's designed as the vision component for a robotic arm system that can play Connect 4 against humans.
+Training a FCNN to detect pieces in a tic tac toe / connect 4 board. It's designed as the vision component for a robotic arm (Ned 2) that can play these games against humans.
 
 ## Project Overview
 
@@ -9,29 +9,49 @@ This detection system is part of a larger robotic Connect 4 player project. The 
 ## Training Process
 
 ### 1. Data Collection
-Approximately **700 pictures** of Connect 4 game boards were captured in various game states and lighting conditions to create a diverse training dataset.
+Approximately **700 pictures** of game boards were captured in various game states and lighting conditions to create a diverse training dataset.
 
-### 2. Image Preprocessing
-The `rename.py` script normalizes all image filenames to ensure consistent naming conventions across the dataset.
+### 2. Labeling
+The `automatic_label.py` tool provides a user-friendly GUI for annotating the boards states in each image:
 
-### 3. Labeling
-The `automatic_label.py` tool provides a user-friendly GUI for annotating the Connect 4 board states in each image:
-
-<img src="connect4/data/labeling.png" width="400" alt="Labeling Interface">
+<img src="connect4/data/labeling.png" width="300" alt="Connect 4 Labeling Interface">
+<img src="tictactoe/data/labeling.png" width="300" alt="Tic Tac Toe Labeling Interface">
 
 This interface allows quick and accurate labeling of each cell in the 6x7 Connect 4 grid, marking empty spaces, red pieces, and yellow pieces.
 
 ### 4. Model Training
-A **Fully Convolutional Neural Network (FCNN)** is trained to detect and classify each position on the Connect 4 board. The model learns to:
+A **Fully Convolutional Neural Network (FCNN)** is trained to detect and classify each position on the board. The model learns to:
 - Identify the board grid structure
-- Classify each cell as empty, red piece, or yellow piece
+- Classify each cell as empty, first class or second class piece
 - Handle various lighting conditions
+
+Samples of the images:
+- For connect 4:
+
+<img src="connect4/data/images_sample/image_0000.png" width="100" alt="image sample">
+<img src="connect4/data/images_sample/image_0014.png" width="100" alt="image sample">
+<img src="connect4/data/images_sample/image_0442.png" width="100" alt="image sample">
+<img src="connect4/data/images_sample/image_0569.png" width="100" alt="image sample">
+<img src="connect4/data/images_sample/image_0289.png" width="100" alt="image sample">
+
+- For tictactoe:
+
+<img src="tictactoe/data/images_sample/image_0072.png" width="100" alt="image sample">
+<img src="tictactoe/data/images_sample/image_0119.png" width="100" alt="image sample">
+<img src="tictactoe/data/images_sample/image_0160.png" width="100" alt="image sample">
+<img src="tictactoe/data/images_sample/image_0286.png" width="100" alt="image sample">
+<img src="tictactoe/data/images_sample/image_0270.png" width="100" alt="image sample">
 
 ### Training Results
 
-<img src="connect4/plots/training_plot2.png" alt="Training Progress">
+<img src="connect4/plots/training_plot2.png" alt="Training Progress" width="300">
+<img src="tictactoe/plots/training_plot.png" alt="Training Progress" width="300">
 
-The plot shows the model's learning progress across training epochs, demonstrating convergence of both training and validation metrics.
+Legend:
+- Orange: training accuracy
+- Green: validation accuracy
+- Blue: loss
+
 
 ## Purpose
 

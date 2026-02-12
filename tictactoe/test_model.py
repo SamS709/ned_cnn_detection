@@ -2,18 +2,18 @@ import torch
 import os
 from model import Model
 import torchvision.transforms.v2 as T
-from data_loader import Connect4Dataset
+from data_loader import TicTacToeDataset
 from torch.utils.data import random_split
 from transformer import transform_test
 
-model = torch.load(os.path.join("models", "first_model.pt"), weights_only= False)
+model = torch.load(os.path.join("tictactoe", "models", "model.pt"), weights_only= False)
 
 
 
 # Create dataset
-dataset = Connect4Dataset(
-    labels_path="data/labels.json",
-    images_dir="data/images",
+dataset = TicTacToeDataset(
+    labels_path="tictactoe/data/labels.json",
+    images_dir="tictactoe/data/images",
     transform=transform_test
 )
 
@@ -33,6 +33,6 @@ with torch.no_grad():
     output = model(input_image)
 y_pred = torch.argmax(output, dim=1)
 print("y_pred = \n", y_pred)
-print("y_true = \n", y_true.reshape([6,7]).cpu().numpy())
+print("y_true = \n", y_true.reshape([3,3]).cpu().numpy())
 print(torch.sum((y_pred - y_true), dim=[0,1,2]))
     

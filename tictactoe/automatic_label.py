@@ -7,9 +7,9 @@ from datetime import datetime
 
 # bad data:
 # 80, 133, 149, 207, 308, 325, 337, 367, 388, 395, 444, 454
-
-class Connect4Labeler:
-    def __init__(self, images_dir="data/images", labels_path="data/labels.json"):
+# 532 544 571 238 275
+class TicTacToe4Labeler:
+    def __init__(self, images_dir="tictactoe/data/images", labels_path="tictactoe/data/labels.json"):
         self.images_dir = Path(images_dir)
         self.labels_path = Path(labels_path)
         self.grid = np.zeros((3, 3), dtype=int)  # 3 * 3 grid
@@ -30,10 +30,9 @@ class Connect4Labeler:
         
         # Load existing labels if they exist
         self.load_labels()
-        
         # Get list of images
         self.load_image_list()
-        self.load_first_image_index()
+        # self.load_first_image_index()
         
 
         
@@ -65,10 +64,11 @@ class Connect4Labeler:
     def load_image_list(self):
         """Get list of all images in the directory"""
         extensions = ['*.jpg', '*.jpeg', '*.png', '*.JPG', '*.JPEG', '*.PNG']
+        image_set = set()
         for ext in extensions:
-            self.image_list.extend(list(self.images_dir.glob(ext)))
+            image_set.update(self.images_dir.glob(ext))
         
-        self.image_list.sort()
+        self.image_list = sorted(list(image_set))
         print(f"Found {len(self.image_list)} images")
     
     def load_first_image_index(self):
@@ -84,7 +84,6 @@ class Connect4Labeler:
         if not self.image_list:
             print("No images found!")
             return False
-            
         image_path = self.image_list[self.current_index]
         self.current_image_name = image_path.name
         self.current_image = cv2.imread(str(image_path))
@@ -126,7 +125,7 @@ class Connect4Labeler:
                     center_x = col * cell_width + cell_width // 2
                     center_y = row * cell_height + cell_height // 2
                     white = (255, 255, 255)
-                    size = min(cell_width, cell_height) // 3
+                    size = min(cell_width, cell_height) // 6
                     
                     if self.grid[row, col] == 2:
                         # Draw white square for value 1
@@ -145,7 +144,7 @@ class Connect4Labeler:
         
     def mouse_callback(self, event, x, y, flags, param):
         """Handle mouse clicks on the image"""
-        if event == cv2.EVENT_LBUTTONDOWN:
+        if event in [cv2.EVENT_LBUTTONDOWN, cv2.EVENT_RBUTTONDOWN, cv2.EVENT_MBUTTONDOWN]:
             h, w = self.current_image.shape[:2]
             cell_width = w // 3
             cell_height = h // 3
@@ -156,8 +155,15 @@ class Connect4Labeler:
             
             # Ensure valid indices
             if 0 <= row < 3 and 0 <= col < 3:
-                # Cycle through states: 0 -> 1 -> 2 -> 0
-                self.grid[row, col] = (self.grid[row, col] + 1) % 3
+                if event == cv2.EVENT_LBUTTONDOWN:
+                    # Left click: circle (player 1)
+                    self.grid[row, col] = 1
+                elif event == cv2.EVENT_RBUTTONDOWN:
+                    # Right click: square (player 2)
+                    self.grid[row, col] = 2
+                elif event == cv2.EVENT_MBUTTONDOWN:
+                    # Middle click: erase
+                    self.grid[row, col] = 0
                 print(f"Cell ({row}, {col}) = {self.grid[row, col]}")
                 
     def save_current_label(self):
@@ -195,7 +201,9 @@ class Connect4Labeler:
         
         print("\n=== Connect 4 Labeling Tool ===")
         print("Controls:")
-        print("  Left Click: Cycle cell state (Empty -> Player 1 -> Player 2)")
+        print("  Left Click: Place circle (Player 1)")
+        print("  Right Click: Place square (Player 2)")
+        print("  Middle Click: Erase (Empty)")
         print("  's': Save current label")
         print("  'n': Next image (auto-saves)")
         print("  'p': Previous image (auto-saves)")
@@ -232,6 +240,7 @@ class Connect4Labeler:
                 # Next image
                 self.save_current_label()
                 if self.next_image():
+                    print(self.current_index)
                     self.load_current_image()
                 else:
                     print("Already at last image")
@@ -239,6 +248,7 @@ class Connect4Labeler:
                 # Previous image
                 self.save_current_label()
                 if self.prev_image():
+                    
                     self.load_current_image()
                 else:
                     print("Already at first image")
@@ -252,5 +262,5 @@ class Connect4Labeler:
 
 
 if __name__ == "__main__":
-    labeler = Connect4Labeler()
+    labeler = TicTacToe4Labeler()
     labeler.run()

@@ -2,7 +2,7 @@ import torch.nn as nn
 import torch
 class Model(nn.Module):
     
-    def __init__(self, in_channels=3, num_classes=3, *args, **kwargs):
+    def __init__(self, in_channels=1, num_classes=3, *args, **kwargs):
         super().__init__(*args, **kwargs)
         
         # Encoder - feature extraction
@@ -92,8 +92,8 @@ class Model(nn.Module):
         # Class prediction: num_classes per spatial location
         self.class_head = nn.Conv2d(32, num_classes, kernel_size=1)
         
-        # Adaptive pooling to fixed grid size (6 rows x 7 columns)
-        self.grid_pool = nn.AdaptiveAvgPool2d((6, 7))
+        # Adaptive pooling to fixed grid size (3 rows x 3 columns)
+        self.grid_pool = nn.AdaptiveAvgPool2d((3, 3))
     
     def forward(self, x):
         # Encoder

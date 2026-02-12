@@ -4,7 +4,7 @@ from pathlib import Path
 # Rename the pictures by "image_ijkl"
 
 def rename_images():
-    images_dir = Path("data/images")
+    images_dir = Path("tictactoe/data/images")
     
     image_files = sorted([f for f in images_dir.iterdir() if f.is_file() and f.suffix == '.png'])
     
