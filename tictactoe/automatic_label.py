@@ -12,7 +12,7 @@ class Connect4Labeler:
     def __init__(self, images_dir="data/images", labels_path="data/labels.json"):
         self.images_dir = Path(images_dir)
         self.labels_path = Path(labels_path)
-        self.grid = np.zeros((3, 3), dtype=int)  # 6 rows, 7 columns
+        self.grid = np.zeros((3, 3), dtype=int)  # 3 * 3 grid
         self.current_image = None
         self.current_image_name = None
         self.image_list = []
@@ -33,16 +33,25 @@ class Connect4Labeler:
         
         # Get list of images
         self.load_image_list()
-        # self.load_first_image_index()
+        self.load_first_image_index()
         
 
         
     def load_labels(self):
         """Load existing labels from JSON file"""
         if self.labels_path.exists():
-            with open(self.labels_path, 'r') as f:
-                self.labels_data = json.load(f)
-            print(f"Loaded {len(self.labels_data)} existing labels")
+            try:
+                with open(self.labels_path, 'r') as f:
+                    content = f.read().strip()
+                    if content:
+                        self.labels_data = json.loads(content)
+                        print(f"Loaded {len(self.labels_data)} existing labels")
+                    else:
+                        self.labels_data = {}
+                        print("Labels file is empty, starting fresh")
+            except json.JSONDecodeError:
+                self.labels_data = {}
+                print("Labels file contains invalid JSON, starting fresh")
         else:
             self.labels_data = {}
             
@@ -92,7 +101,7 @@ class Connect4Labeler:
             self.grid = np.array(self.labels_data[self.current_image_name]["grid"], dtype=int)
             print(f"Loaded existing label for {self.current_image_name}")
         # else:
-        #     self.grid = np.zeros((6, 7), dtype=int)
+        #     self.grid = np.zeros((3, 3), dtype=int)
             
         return True
         
@@ -101,34 +110,36 @@ class Connect4Labeler:
         h, w = display_image.shape[:2]
         
         # Calculate cell dimensions
-        cell_width = w // 7
-        cell_height = h // 6
+        cell_width = w // 3
+        cell_height = h // 3
         
         # Draw grid lines
-        for i in range(1, 7):
+        for i in range(1, 3):
             cv2.line(display_image, (i * cell_width, 0), (i * cell_width, h), (0, 255, 0), 2)
-        for i in range(1, 6):
+        for i in range(1, 3):
             cv2.line(display_image, (0, i * cell_height), (w, i * cell_height), (0, 255, 0), 2)
             
         # Draw circles for labeled positions
-        for row in range(6):
-            for col in range(7):
+        for row in range(3):
+            for col in range(3):
                 if self.grid[row, col] != 0:
                     center_x = col * cell_width + cell_width // 2
                     center_y = row * cell_height + cell_height // 2
-                    color = self.colors[self.grid[row, col]]
-                    if self.grid[row, col] == 1:
-                        cv2.circle(display_image, (center_x, center_y), 
-                                min(cell_width, cell_height) // 3, color, -1)
+                    white = (255, 255, 255)
+                    size = min(cell_width, cell_height) // 3
+                    
+                    if self.grid[row, col] == 2:
+                        # Draw white square for value 1
+                        top_left = (center_x - size, center_y - size)
+                        bottom_right = (center_x + size, center_y + size)
+                        cv2.rectangle(display_image, top_left, bottom_right, white, -1)
                         # Add black border
-                        cv2.circle(display_image, (center_x, center_y), 
-                                min(cell_width, cell_height) // 3, (0, 0, 0), 2)
+                        cv2.rectangle(display_image, top_left, bottom_right, (0, 0, 0), 2)
                     else:
-                        cv2.rectangle(display_image, (center_x, center_y), 
-                                min(cell_width, cell_height) // 3, color, -1)
+                        # Draw white circle for value 2
+                        cv2.circle(display_image, (center_x, center_y), size, white, -1)
                         # Add black border
-                        cv2.rectangle(display_image, (center_x, center_y), 
-                                min(cell_width, cell_height) // 3, (0, 0, 0), 2)
+                        cv2.circle(display_image, (center_x, center_y), size, (0, 0, 0), 2)
                              
         return display_image
         
@@ -136,15 +147,15 @@ class Connect4Labeler:
         """Handle mouse clicks on the image"""
         if event == cv2.EVENT_LBUTTONDOWN:
             h, w = self.current_image.shape[:2]
-            cell_width = w // 7
-            cell_height = h // 6
+            cell_width = w // 3
+            cell_height = h // 3
             
             # Calculate which cell was clicked
             col = x // cell_width
             row = y // cell_height
             
             # Ensure valid indices
-            if 0 <= row < 6 and 0 <= col < 7:
+            if 0 <= row < 3 and 0 <= col < 3:
                 # Cycle through states: 0 -> 1 -> 2 -> 0
                 self.grid[row, col] = (self.grid[row, col] + 1) % 3
                 print(f"Cell ({row}, {col}) = {self.grid[row, col]}")
@@ -233,7 +244,7 @@ class Connect4Labeler:
                     print("Already at first image")
             elif key == ord('r'):
                 # Reset grid
-                self.grid = np.zeros((6, 7), dtype=int)
+                self.grid = np.zeros((3, 3), dtype=int)
                 print("Grid reset")
                 
         cv2.destroyAllWindows()
