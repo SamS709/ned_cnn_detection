@@ -17,7 +17,7 @@ The `rename.py` script normalizes all image filenames to ensure consistent namin
 ### 3. Labeling
 The `automatic_label.py` tool provides a user-friendly GUI for annotating the Connect 4 board states in each image:
 
-<img src="labeling.png" width="400" alt="Labeling Interface">
+<img src="connect4/data/labeling.png" width="400" alt="Labeling Interface">
 
 This interface allows quick and accurate labeling of each cell in the 6x7 Connect 4 grid, marking empty spaces, red pieces, and yellow pieces.
 
@@ -29,7 +29,7 @@ A **Fully Convolutional Neural Network (FCNN)** is trained to detect and classif
 
 ### Training Results
 
-<img src="plots/training_plot2.png" alt="Training Progress">
+<img src="connect4/plots/training_plot2.png" alt="Training Progress">
 
 The plot shows the model's learning progress across training epochs, demonstrating convergence of both training and validation metrics.
 
