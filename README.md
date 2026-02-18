@@ -53,13 +53,6 @@ Legend:
 - Blue: loss
 
 
-## Purpose
-
-This detection system enables a robotic arm to:
-1. Visually perceive the current game state
-2. Identify valid moves
-3. Plan and execute strategic gameplay against human opponents
-
 The complete robotic system integrating this vision module with motion control is available at: [https://github.com/SamS709/ned_project](https://github.com/SamS709/ned_project)
 
 ## Usage
