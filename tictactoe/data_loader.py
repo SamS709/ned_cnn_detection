@@ -38,7 +38,7 @@ class TicTacToeDataset(Dataset):
         # Get image name and load image
         image_name = self.image_names[idx]
         image_path = self.images_dir / image_name
-        image = Image.open(image_path).convert('L')
+        image = Image.open(image_path).convert('RGB')
         
         # Get label grid (3x3)
         grid = np.array(self.labels_data[image_name]["grid"], dtype=np.int64)
@@ -51,4 +51,46 @@ class TicTacToeDataset(Dataset):
         
         
         return image, label
+    
+if __name__ == "__main__":
+    import torch
+    from torch.utils.data import DataLoader, random_split
+    import numpy as np
 
+    import matplotlib.pyplot as plt
+    from data_loader import TicTacToeDataset
+    from transformer import transform_train
+    dataset = TicTacToeDataset(
+        labels_path="tictactoe/data/labels.json",
+        images_dir="tictactoe/data/images",
+        transform=transform_train
+    )
+    
+    # Split into train/validation (80/20)
+    train_size = int(0.8 * len(dataset))
+    val_size = len(dataset) - train_size
+    train_set, val_set = random_split(dataset, [train_size, val_size])
+    
+    print(f"Train set: {len(train_set)} images")
+    print(f"Validation set: {len(val_set)} images")
+
+    
+    # Create DataLoaders
+    train_loader = DataLoader(train_set, batch_size=32, shuffle=True, num_workers=2)
+    val_loader = DataLoader(val_set, batch_size=32, shuffle=False, num_workers=2)
+    Xs, ys = next(iter(train_loader))
+    
+    # Display 20 images in a grid
+    fig, axes = plt.subplots(4, 5, figsize=(15, 12))
+    axes = axes.flatten()
+    
+    for i in range(20):
+        img = Xs[i].permute(1, 2, 0)  # Convert from CHW to HWC
+        label = ys[i].numpy()
+        
+        axes[i].imshow(img)
+        axes[i].set_title(f"Grid:\n{label}", fontsize=8)
+        axes[i].axis('off')
+    
+    plt.tight_layout()
+    plt.show()
