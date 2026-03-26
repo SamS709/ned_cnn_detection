@@ -7,7 +7,7 @@ class Model(nn.Module):
         super().__init__(*args, **kwargs)
         
         # Encoder - feature extraction
-        pretrained = torchvision.models.resnet18(torchvision.models.ResNet18_Weights.IMAGENET1K_V1)
+        pretrained = torchvision.models.resnet50(torchvision.models.ResNet50_Weights.IMAGENET1K_V2)
         
         pretrained = list(pretrained.children())
         self.pretrained = nn.Sequential(*pretrained[:-1]) 
