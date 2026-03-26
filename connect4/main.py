@@ -75,7 +75,7 @@ if __name__ == "__main__":
     )
     
     # Split into train/validation (80/20)
-    train_size = int(0.8 * len(dataset))
+    train_size = int(0.9* len(dataset))
     val_size = len(dataset) - train_size
     train_set, val_set = random_split(dataset, [train_size, val_size])
     
@@ -84,15 +84,15 @@ if __name__ == "__main__":
 
     
     # Create DataLoaders
-    train_loader = DataLoader(train_set, batch_size=8, shuffle=True, num_workers=2)
-    val_loader = DataLoader(val_set, batch_size=8, shuffle=False, num_workers=2)
+    train_loader = DataLoader(train_set, batch_size=1024, shuffle=True, num_workers=8)
+    val_loader = DataLoader(val_set, batch_size=1024, shuffle=False, num_workers=8)
     
     # Initialize model
     model = Model().to(device)
     
     # Training parameters
     model_dir = "models"
-    model_name = "model3.pt"
+    model_name = "model4.pt"
     plot_dir = "plots"
     n_epochs = 150
     optimizer = torch.optim.Adam(params=model.parameters(), lr=0.001)
