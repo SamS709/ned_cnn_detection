@@ -3,7 +3,7 @@ import os
 from PIL import Image
 from transformer import transform_test
 
-model = torch.load(os.path.join("models", "model4.pt"), weights_only= False, map_location=torch.device('cpu') )
+model = torch.load(os.path.join("models", "model5.pt"), weights_only= False, map_location=torch.device('cpu') )
 
 image_name = "current.png"
 image_path = os.path.join("data", "images_sample", image_name)

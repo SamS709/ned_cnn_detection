@@ -92,7 +92,7 @@ if __name__ == "__main__":
     
     # Training parameters
     model_dir = "models"
-    model_name = "model4.pt"
+    model_name = "model5.pt"
     plot_dir = "plots"
     n_epochs = 150
     optimizer = torch.optim.Adam(params=model.parameters(), lr=0.001)
