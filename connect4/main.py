@@ -23,8 +23,9 @@ def evaluate_tm(model, data_loader, metric, device):
     return metric.compute()
 
 def train_with_scheduler(model, optimizer, loss_fn, metric, train_loader,
-                         valid_loader, n_epochs, scheduler, device):
+                         valid_loader, n_epochs, scheduler, device, model_name, model_dir):
     history = {"train_losses": [], "train_metrics": [], "valid_metrics": []}
+    best_val_metric = -float('inf')
     for epoch in range(n_epochs):
         losses = []
         metric.reset()
@@ -46,6 +47,13 @@ def train_with_scheduler(model, optimizer, loss_fn, metric, train_loader,
               f"train loss: {history['train_losses'][-1]:.4f}, "
               f"train metric: {history['train_metrics'][-1]:.4f}, "
               f"valid metric: {history['valid_metrics'][-1]:.4f}")
+        
+        # Save model if validation metric improved
+        if val_metric > best_val_metric:
+            best_val_metric = val_metric
+            torch.save(model, os.path.join(model_dir, model_name))
+            print(f"Model saved: {model_name}")
+        
         if isinstance(scheduler, torch.optim.lr_scheduler.ReduceLROnPlateau):
             scheduler.step(val_metric)
         else:
@@ -84,15 +92,16 @@ if __name__ == "__main__":
     
     # Training parameters
     model_dir = "models"
+    model_name = "model3.pt"
     plot_dir = "plots"
-    n_epochs = 50
+    n_epochs = 150
     optimizer = torch.optim.Adam(params=model.parameters(), lr=0.001)
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode="max", patience=5, factor=0.1)
     accuracy = torchmetrics.Accuracy(task="multiclass", num_classes=3).to(device)
     loss_fn = nn.CrossEntropyLoss().to(device)
     
     # Train the model
-    history = train_with_scheduler(model, optimizer, loss_fn, accuracy, train_loader, val_loader, n_epochs, scheduler, device)
+    history = train_with_scheduler(model, optimizer, loss_fn, accuracy, train_loader, val_loader, n_epochs, scheduler, device, model_name, model_dir)
     if not os.path.exists(model_dir):
         os.makedirs(model_dir) 
     if not os.path.exists(plot_dir):
@@ -101,7 +110,7 @@ if __name__ == "__main__":
     plt.plot(history["train_metrics"])
     plt.plot(history["valid_metrics"])
     
-    plt.savefig(os.path.join(plot_dir, "training_plot2.png"))
-    torch.save(model, os.path.join(model_dir,"model2.pt"))
+    plt.savefig(os.path.join(plot_dir, "training_plot3.png"))
+
     
 
